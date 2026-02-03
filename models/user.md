@@ -1,33 +1,48 @@
-USER Use cases
+# User Module Design
 
-MAIN MENU
-1. Create New User
-2. Login With Profile
+The User class represents a student profile for scholarship matching.
 
+# User Flows
 
-1. User First time using no profile
+# Flow 1: New User (No Profile)
 
-Chooses Create New user
-Ask user info(name,email,gpa,major,ex..)
-Intalize an user object with this information and creates user profile >
-user saves profile to json file for future use
+1. User selects **"Create New User"** from main menu
+2. gives prompts for: name, email, GPA, major, province, demographics, activities, department
+3. System validates input (GPA 0-4, valid province, valid education level)
+4. Creates `User` object with provided data
+5. User provides filepath (e.g., `data/user_profiles/ladoLogga.json`)
+6. Calls `user.save_stats(filepath)` to persist to JSON
 
-user create user object
-to save user object we convert it to a dict using to_dict
-we than save it in json file
+**Under the hood:**
 
+- `save_stats()` calls `to_dict()` to convert User → dictionary
+- Dictionary is written to JSON file via `json.dump()`
 
-2.  User already has a profile 
+---
 
-Chooses login with profile 
-User enters filepath
-call loadstats  return user profile object
+# Flow 2: Returning User (Has Profile)
 
-what happens under the hood
-loadstats function gets the dict(which contains name,emaill ex....) from a json file
-store it in a variable, call from_dict() function which turns the dict to user object
+1. User selects **"Login with Profile"** from main menu
+2. User provides filepath to their saved profile
+3. System calls `User.load_stats(filepath)`
+4. Returns populated User object
 
+**Under the hood:**
 
+- `load_stats()` reads JSON file → dictionary
+- Calls `from_dict()` to convert dictionary → User object
+- Returns the User object
 
+## Class Methods Summary
 
-demographics: age, firstgen, background, miniorites 
+| Method           | Type        | Purpose                         |
+| ---------------- | ----------- | ------------------------------- |
+| `__init__()`     | Instance    | Create user with validation     |
+| `to_dict()`      | Instance    | Convert user to dictionary      |
+| `from_dict()`    | Classmethod | Create user from dictionary     |
+| `save_stats()`   | Instance    | Save user to JSON file          |
+| `load_stats()`   | Classmethod | Load user from JSON file        |
+| `is_first_gen`   | Property    | Check first-gen status          |
+| `is_minority`    | Property    | Check minority status           |
+| `has_disability` | Property    | Check disability status         |
+| `__repr__()`     | Instance    |  print user for debugging       |

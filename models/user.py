@@ -2,21 +2,21 @@
 import json
 
 class User:
-    def __init__(self, name, email,education_level, major,gpa, province,demographics,activities):
+    def __init__(self, name, email,education_level, major,gpa, province,demographics,activities, department):
 
         valid_education = ["highschool", "university", "college"]
         valid_province = ["ontario"]
         if education_level.lower() not in valid_education:
             raise ValueError(f"Educational Levels must be one of: {valid_education}")
-            return None
+        
 
         if province.lower() not in valid_province:
             raise ValueError(f"Must live in one of these provnices: {valid_province}")
-            return None
+            
         
         if not (0.0 <= gpa <= 4.0):
             raise ValueError("GPA must be between 0.0 and 4.0")
-            return None
+            
         
         self.name = name
         self.email = email
@@ -26,6 +26,7 @@ class User:
         self.province = province
         self.demographics = demographics
         self.activities = activities
+        self.department = department
 
     def to_dict(self):
        return  {
@@ -36,12 +37,13 @@ class User:
             "gpa": self.gpa,
             "province": self.province,
             "demographics": self.demographics,
-            "activities": self.activities
+            "activities": self.activities,
+            "department": self.department
         }
     
     @classmethod
     def from_dict(cls,stats):
-        return cls(stats["name"], stats["email"], stats["education_level"], stats["major"], stats["gpa"], stats["province"], stats["demographics"], stats["activities"]
+        return cls(stats["name"], stats["email"], stats["education_level"], stats["major"], stats["gpa"], stats["province"], stats["demographics"], stats["activities"], stats["department"]
         )
 
 
@@ -59,24 +61,26 @@ class User:
             print("FILE NOT FOUND, PLEASE CREATE A USER BEFORE TRYING TO LOAD USERS"
             )
             return None
-       
-        return cls.from_dict(stats)
+        
+        user = cls.from_dict(stats)
+
+        return user
 
     @property
     def is_first_gen(self):
-    return self.demographics.get("first_gen",False)
+        return self.demographics.get("first_gen",False)
 
     @property
-    def is_miniority(self)
-    return self.demographics.get("miniority",False)
+    def is_minority(self):
+        return self.demographics.get("minority",False)
 
     @property
-    def has_disability(self)
-    return self.demographics.get("disabled",False)
+    def has_disability(self):
+        return self.demographics.get("disabled",False)
 
 
     def __repr__(self):
-        return f"Usr(name='{self.name}', email='{email}',educational_level='{education_level}',  major='{self.major}', gpa='{gpa}', province='{province}', demographics='{demographics}', activities='{activities}')"
+        return f"Usr(name='{self.name}', email='{self.email}',education_level='{self.education_level}',  major='{self.major}', gpa='{self.gpa}', province='{self.province}', demographics='{self.demographics}', activities='{self.activities}, department='{self.department}')"
 
 
     
