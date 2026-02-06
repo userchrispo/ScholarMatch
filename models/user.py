@@ -2,7 +2,7 @@
 import json
 
 class User:
-    def __init__(self, name, email,education_level, major,gpa, province,demographics,activities, department):
+    def __init__(self, name, email,education_level, major,gpa, year,  province,demographics,activities, department):
 
         valid_education = ["highschool", "university", "college"]
         valid_province = ["ontario"]
@@ -23,6 +23,7 @@ class User:
         self.education_level = education_level
         self.major = major
         self.gpa = gpa 
+        self.year = year
         self.province = province
         self.demographics = demographics
         self.activities = activities
@@ -43,7 +44,7 @@ class User:
     
     @classmethod
     def from_dict(cls,stats):
-        return cls(stats["name"], stats["email"], stats["education_level"], stats["major"], stats["gpa"], stats["province"], stats["demographics"], stats["activities"], stats["department"]
+        return cls(stats["name"], stats["email"], stats["education_level"], stats["major"], stats["gpa"],stats["year"], stats["province"], stats["demographics"], stats["activities"], stats["department"]
         )
 
 
@@ -80,7 +81,7 @@ class User:
 
 
     def __repr__(self):
-        return f"Usr(name='{self.name}', email='{self.email}',education_level='{self.education_level}',  major='{self.major}', gpa='{self.gpa}', province='{self.province}', demographics='{self.demographics}', activities='{self.activities}, department='{self.department}')"
+        return f"Usr(name='{self.name}', email='{self.email}',education_level='{self.education_level}',  major='{self.major}', gpa='{self.gpa}', year='{self.year}', province='{self.province}', demographics='{self.demographics}', activities='{self.activities}, department='{self.department}')"
 
 
     
