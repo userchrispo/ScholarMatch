@@ -1,14 +1,19 @@
-from datetime import date
+from datetime import date, datetime
 import json
 
 
 class Scholarship:
-    def __init__(self,id,name,provider,amount_min,amount_max,deadline,eligibility,field_of_studys,url,description):
+    def __init__(self, id, name, provider, amount_min, amount_max, deadline,
+                 eligibility, field_of_studys, url, description, citizenship_requirement="any"):
         if (amount_min <= 0) or (amount_max <= 0):
             raise ValueError("SCHOLARSHIPS MUST PROVIDE MONEY")
 
         if (amount_min > amount_max):
             raise ValueError("amount_min cannot exceed amount_max")
+        
+        # Handle deadline as string or date
+        if isinstance(deadline, str):
+            deadline = datetime.strptime(deadline, "%Y-%m-%d").date()
         
         if (deadline < date.today()):
             raise ValueError("Scholarships must be appliable")
@@ -23,25 +28,32 @@ class Scholarship:
         self.field_of_studys = field_of_studys
         self.url = url
         self.description = description
+        self.citizenship_requirement = citizenship_requirement
 
     
-    def is_eligible(self,user):
+    def is_eligible(self, user):
 
-        if user.education_level not in self.eligibility.get("education_level",[user.education_level]):
+        if user.education_level not in self.eligibility.get("education_level", [user.education_level]):
             return False
         if self.field_of_studys and user.major not in self.field_of_studys:
             return False
-        if not user.gpa >= self.eligibility.get("min_gpa",0):
+        if not user.gpa >= self.eligibility.get("min_gpa", 0):
             return False
-        if user.province not in self.eligibility.get("provinces",[user.province]):
+        if user.province not in self.eligibility.get("provinces", [user.province]):
             return False
         if (self.deadline < date.today()):
             return False
-        if self.eligibility.get("first_gen",False) and  not user.is_first_gen:
+        if self.eligibility.get("first_gen", False) and not user.is_first_gen:
             return False
-        if self.eligibility.get("minority",False) and  not user.is_minority:
+        if self.eligibility.get("minority", False) and not user.is_minority:
             return False
         
+        # Citizenship check
+        if self.citizenship_requirement != "any":
+            if self.citizenship_requirement == "canadian" and user.citizenship != "canadian":
+                return False
+            if self.citizenship_requirement == "canadian_or_pr" and user.citizenship == "international":
+                return False
         
         return True
 
@@ -53,37 +65,30 @@ class Scholarship:
             "provider": self.provider,
             "amount_min": self.amount_min,
             "amount_max": self.amount_max,
-            "deadline": self.deadline,
+            "deadline": self.deadline.isoformat() if isinstance(self.deadline, date) else self.deadline,
             "eligibility": self.eligibility,
             "field_of_studys": self.field_of_studys,
             "url": self.url,
-            "description": self.description
+            "description": self.description,
+            "citizenship_requirement": self.citizenship_requirement
         }
     
 
     @classmethod
-    def from_dict(cls,data):
-
-        return cls(data["id"], data["name"], data["provider"], data["amount_min"], data["amount_max"], data["deadline"], data["eligibility"], data["field_of_studys"], data["url"], data["description"])
+    def from_dict(cls, data):
+        return cls(
+            data["id"], data["name"], data["provider"],
+            data["amount_min"], data["amount_max"], data["deadline"],
+            data["eligibility"], data["field_of_studys"],
+            data["url"], data["description"],
+            data.get("citizenship_requirement", "any")
+        )
     
 
     @property
     def is_open(self):
         return self.deadline >= date.today()
-    
-
-
-
-
-
-
-
-
 
     def __repr__(self):
-        return f"Scholarship(name='{self.name}', amount$='{self.amount_max}', deadline='{self.deadline}', eligibility='{self.eligibility}"
-        
-
-        
-        
-        
+        return (f"Scholarship(name='{self.name}', amount$={self.amount_max}, "
+                f"deadline='{self.deadline}', citizenship='{self.citizenship_requirement}')")

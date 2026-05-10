@@ -1,8 +1,18 @@
+# Data files
+data/
 
-readme.md
+# Technical build doc (internal)
+docs/TECHNICAL.md
+
+# Design docs
 data_loader.md
 scholarship.md
 user.md
-data_loader.md
 
-data
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Test artifacts
+test_pipeline.py
